@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    body { background-color: #f8f9fa; }
+    h2 { font-weight: 700; }
+    .summary-card { border-radius: 12px; transition: transform 0.2s; }
+    .summary-card:hover { transform: translateY(-3px); }
+    .chart-container { height: 32vh; }
+    table { font-size: 0.9rem; }
+    th, td { vertical-align: middle !important; }
+    .filter-card { border-radius: 12px; }
+    @media (max-width: 768px) {
+      .chart-container { height: 45vh; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container py-4">
+    <h2 class="mb-4 text-center text-primary">💰 Personal Finance Dashboard</h2>
+
+    <!-- Filters -->
+    <form method="get" class="row g-3 mb-4 justify-content-center">
+      <div class="col-md-3 col-sm-6">
+        <label class="form-label">Month</label>
+        <select name="month" class="form-select">
+          <option value="">All Months</option>
+          {% for m in months %}
+            <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>{{ m }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-select">
+          <option value="All">All Categories</option>
+          {% for c in categories %}
+            <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <label class="form-label">Search</label>
+        <input type="text" name="search" class="form-control" placeholder="Search date, type, amount..."
+               value="{{ search_query }}">
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Filter</button>
+      </div>
+    </form>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card summary-card text-center p-3 border-success shadow-sm">
+          <h6 class="text-muted mb-2">Total Income</h6>
+          <h3 class="fw-bold text-success mb-0">₹ {{ summary.income|floatformat:2 }}</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card summary-card text-center p-3 border-danger shadow-sm">
+          <h6 class="text-muted mb-2">Total Expense</h6>
+          <h3 class="fw-bold text-danger mb-0">₹ {{ summary.expense|floatformat:2 }}</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card summary-card text-center p-3 border-primary shadow-sm">
+          <h6 class="text-muted mb-2">Balance</h6>
+          <h3 class="fw-bold text-primary mb-0">₹ {{ summary.balance|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+
+    {% if summary.top_category %}
+    <div class="alert alert-info text-center shadow-sm">
+      🏆 Highest Expense Category: <strong>{{ summary.top_category }}</strong>
+      (₹ {{ summary.top_value|floatformat:2 }})
+    </div>
+    {% endif %}
+
+    <!-- Chart & Table Row -->
+    <div class="row g-3">
+      <!-- Pie Chart -->
+      <div class="col-lg-6 col-md-12">
+        <div class="card shadow-sm p-3 h-100">
+          <h6 class="text-center text-muted mb-2">Expense Breakdown by Category</h6>
+          <div class="chart-container">
+            <canvas id="expenseChart"></canvas>
+          </div>
+          <p id="noDataMsg" class="text-center text-muted mt-3" style="display:none;">No expense data available.</p>
+        </div>
+      </div>
+
+      <!-- Transaction Table -->
+      <div class="col-lg-6 col-md-12">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">Recent Transactions</h6>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped mb-0 text-center align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if recent %}
+                  {% for tx in recent %}
+                  <tr>
+                    <td>{{ tx.Date }}</td>
+                    <td>{{ tx.Category }}</td>
+                    <td>
+                      {% if tx.Type == "income" %}
+                        <span class="badge text-bg-success">Income</span>
+                      {% else %}
+                        <span class="badge text-bg-danger">Expense</span>
+                      {% endif %}
+                    </td>
+                    <td class="{% if tx.Type == 'income' %}text-success{% else %}text-danger{% endif %} fw-semibold">
+                      ₹ {{ tx.Amount|floatformat:2 }}
+                    </td>
+                    <td>
+                      <a href="{% url 'delete_transaction' forloop.counter0 %}"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Delete this transaction?');">
+                        Delete
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr><td colspan="5" class="text-muted">No transactions available.</td></tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="text-center mt-4">
+      <a href="/add/" class="btn btn-success me-2">+ Add Transaction</a>
+      <a href="/investments/" class="btn btn-primary">Analyze Investments</a>
+    </div>
+  </div>
+
+  <!-- Chart Script -->
+  <script>
+    fetch("/api/expense-chart/")
+      .then(r => r.json())
+      .then(data => {
+        const ctx = document.getElementById("expenseChart");
+        const noDataMsg = document.getElementById("noDataMsg");
+
+        if (!data || data.data.length === 0) {
+          ctx.style.display = "none";
+          noDataMsg.style.display = "block";
+          return;
+        }
+
+        new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: data.labels,
+            datasets: [{
+              data: data.data,
+              backgroundColor: [
+                "#4e79a7", "#f28e2b", "#e15759",
+                "#76b7b2", "#59a14f", "#edc949",
+                "#af7aa1", "#ff9da7", "#9c755f"
+              ],
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "65%",
+            plugins: {
+              legend: { position: "bottom" },
+              title: {
+                display: true,
+                text: "Expense Distribution",
+                font: { size: 15, weight: "bold" }
+              }
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
