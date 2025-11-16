@@ -1,4 +1,31 @@
 Date,Category,Amount,Type
-2025-11-05,Salary,3568,income
+2025-11-05,Salary,3568.0,income
 2025-11-05,GYM,500.0,expense
 2025-11-06,Food,100.0,expense
+2025-11-06,SIP MF,250.0,investment
+2025-10-06,SIP MF,250.0,investment
+2025-10-13,SIP MF,250.0,investment
+2025-11-07,Dividend,45.0,income
+2025-11-01,Bonus,800.0,income
+2025-10-25,Rental Income,1200.0,income
+2025-10-20,Interest,30.0,income
+# Investments (various categories),,,
+2025-09-15,Stocks,1500.0,investment
+2025-09-20,ETF,400.0,investment
+2025-08-30,Mutual Fund Lump Sum,2000.0,investment
+2025-11-02,PPF,100.0,investment
+2025-10-05,Fixed Deposit,5000.0,investment
+2025-11-03,Bonds,1000.0,investment
+2025-07-10,Crypto,300.0,investment
+2025-06-18,Real Estate,10000.0,investment
+# Expenses (common categories),,,
+2025-11-01,Rent,1200.0,expense
+2025-11-02,Utilities,150.0,expense
+2025-11-04,Groceries,220.0,expense
+2025-10-28,Transport,60.0,expense
+2025-10-15,Entertainment,90.0,expense
+2025-09-18,Healthcare,250.0,expense
+2025-08-22,Education,500.0,expense
+2025-11-06,Subscription,15.0,expense
+2025-11-06,Insurance,75.0,expense
+2025-10-31,Taxes,300.0,expense
