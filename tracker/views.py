@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.conf import settings
@@ -119,6 +120,8 @@ def add_investment(request):
 # -----------------------------------------------
 # 💹 INVESTMENT ANALYZER
 # -----------------------------------------------
+
+
 def analyze_investment(request):
     """Analyze and visualize investment performance."""
     tracker = ExpenseTracker(DATA_FILE)
@@ -127,38 +130,59 @@ def analyze_investment(request):
     if df.empty:
         return render(request, "tracker/investment.html", {"error": "No transactions found."})
 
-    # Detect investment transactions flexibly
-    inv_df = df[df["Category"].str.lower().str.contains("invest|sip|mf|fund|stock", na=False)]
+    # Detect investment categories properly
+    investment_keywords = ["invest", "sip", "mf", "fund", "stock", "equity", "mutual"]
+
+    inv_df = df[df["Category"].str.lower().str.contains("|".join(investment_keywords), na=False)]
 
     if inv_df.empty:
         return render(request, "tracker/investment.html", {"error": "No investment data available."})
 
+    # Clean data
     inv_df["Date"] = pd.to_datetime(inv_df["Date"], errors="coerce")
     inv_df = inv_df.dropna(subset=["Date"])
-    inv_df["Month"] = inv_df["Date"].dt.strftime("%Y-%m")
+    inv_df["Amount"] = inv_df["Amount"].astype(float)
 
-    monthly_summary = inv_df.groupby("Month")["Amount"].sum().reset_index().sort_values("Month")
+    # ---- MONTHLY TREND ----
+    inv_df["Month"] = inv_df["Date"].dt.strftime("%Y-%m")
+    monthly_summary = inv_df.groupby("Month")["Amount"].sum().reset_index()
+    monthly_summary = monthly_summary.sort_values("Month")
+
     labels = monthly_summary["Month"].tolist()
     data = monthly_summary["Amount"].tolist()
 
+    # ---- CATEGORY BREAKDOWN ----
+    cat_group = inv_df.groupby("Category")["Amount"].sum().sort_values(ascending=False)
+    cat_labels = cat_group.index.tolist()
+    cat_data = cat_group.values.tolist()
+
+    # ---- Summary ----
     total_invested = float(inv_df["Amount"].sum())
-    avg_monthly = round(total_invested / len(monthly_summary), 2) if len(monthly_summary) > 0 else 0
+    avg_monthly = float(monthly_summary["Amount"].mean()) if not monthly_summary.empty else 0
 
-    cat_breakdown = inv_df.groupby("Category")["Amount"].sum().sort_values(ascending=False).reset_index()
-    cat_labels = cat_breakdown["Category"].tolist()
-    cat_data = cat_breakdown["Amount"].tolist()
-
+    # ---- Recent ----
     recent_investments = inv_df.sort_values("Date", ascending=False).head(10).to_dict("records")
 
+    # ---- Send JSON to template ----
     context = {
-        "total_invested": total_invested,
-        "avg_monthly": avg_monthly,
-        "labels": labels,
-        "data": data,
-        "cat_labels": cat_labels,
-        "cat_data": cat_data,
-        "recent_investments": recent_investments,
-    }
+    "total_invested": total_invested,
+    "avg_monthly": avg_monthly,
+
+    # JSON for charts
+    "labels_json": json.dumps(labels),
+    "data_json": json.dumps(data),
+    "cat_labels_json": json.dumps(cat_labels),
+    "cat_data_json": json.dumps(cat_data),
+
+    # Python lists for summary cards/count
+    "labels": labels,
+    "data": data,
+    "cat_labels": cat_labels,
+    "cat_data": cat_data,
+
+    "recent_investments": recent_investments,
+}
+
 
     return render(request, "tracker/investment.html", context)
 

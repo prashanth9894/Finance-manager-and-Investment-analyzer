@@ -113,10 +113,10 @@
     const catCtx = document.getElementById("categoryChart");
 
     // Parse Django template variables safely as JS objects
-    const labels = JSON.parse('{{ labels|escapejs }}');
-    const data = JSON.parse('{{ data|escapejs }}');
-    const catLabels = JSON.parse('{{ cat_labels|escapejs }}');
-    const catData = JSON.parse('{{ cat_data|escapejs }}');
+    const labels = JSON.parse('{{ labels_json|safe }}');
+    const data = JSON.parse('{{ data_json|safe }}');
+    const catLabels = JSON.parse('{{ cat_labels_json|safe }}');
+    const catData = JSON.parse('{{ cat_data_json|safe }}');
 
     new Chart(trendCtx, {
       type: "bar",
