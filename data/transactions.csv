@@ -1,5 +1,4 @@
 Date,Category,Amount,Type
-2025-11-05,Salary,3568.0,income
 2025-11-06,Food,100.0,expense
 2025-11-06,SIP MF,250.0,investment
 2025-10-06,SIP MF,250.0,investment
@@ -7,7 +6,6 @@ Date,Category,Amount,Type
 2025-11-07,Dividend,45.0,income
 2025-11-01,Bonus,800.0,income
 2025-10-25,Rental Income,1200.0,income
-2025-10-20,Interest,30.0,income
 # Investments (various categories),,,
 2025-09-15,Stocks,1500.0,investment
 2025-09-20,ETF,400.0,investment
