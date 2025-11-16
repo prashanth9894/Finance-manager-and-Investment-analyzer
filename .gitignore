@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+
+# Virtual environment
+venv/
+env/
+
+# Django
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+
+# VS Code
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+*.dll
+*.class
+*.o
+*.a
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# PyCharm
+.idea/
+
+# Environment variables
+*.env
+
+# Backup files
+*.bak
+*.swp
+
+# Node (if using)
+node_modules/
+
+# Local settings (optional)
+local_settings.py
