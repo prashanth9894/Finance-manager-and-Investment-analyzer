@@ -37,10 +37,7 @@ This project combines the features of a **Money Manager app** with an **Investme
 - Insights on top spending categories.  
 - Total investment worth and asset allocation overview.
 
-### 🔐 User Management
-- Secure **login and registration** system.  
-- Personalized dashboard per user.  
-- Session management with Django authentication.
+
 
 ---
 
