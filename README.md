@@ -47,7 +47,7 @@ This project combines the features of a **Money Manager app** with an **Investme
 |-------|-------------|
 | **Frontend** | HTML, CSS, Bootstrap 5, Chart.js |
 | **Backend** | Python, Django Framework |
-| **Database** | SQLite (default) |
+| **Database** | Currently CSV Dataset (F => SQLite (default) |
 | **Version Control** | Git & GitHub |
 | **Libraries** | Pandas, Matplotlib (optional) |
 
@@ -69,7 +69,7 @@ FinanceManager/
 ├── data/
 │   └── transactions.csv       # Example data
 │
-├── db.sqlite3                 # Local database
+├── db.sqlite3                 # Local database to be implemented
 ├── manage.py                  # Django runner
 ├── requirements.txt           # Dependencies
 └── README.md                  # Documentation
@@ -177,4 +177,5 @@ If you like this project, please ⭐ **star the repo** and share it with others!
 Your support motivates continued development 🚀
 
 ---
+
 
